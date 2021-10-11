@@ -1,3 +1,3 @@
 # mycloud_api
 
-API para el prouecto
+API para el proyecto del curso Full-Stack JavaScript
