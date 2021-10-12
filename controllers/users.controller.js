@@ -3,7 +3,7 @@ const { Validator } = require('node-input-validator');
 
 module.exports.getOne = async (req, res) => {
     try {
-        const user = await User.getOne(req.params.id);
+        const user = await User.getOne('id', req.params.id);
         return res.status(200).json(user);
     } catch (err) {
         const statusCode = err.statusCode || 500;

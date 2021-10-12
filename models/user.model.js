@@ -1,4 +1,5 @@
 const db = require('./db');
+const bcrypt = require('bcrypt');
 
 module.exports = class User {
 
@@ -11,12 +12,12 @@ module.exports = class User {
     }
 
     // Get one user by id
-    static async getOne(id) {
+    static async getOne(getBy, value) {
         try {
             const [queryResponse] = await db.execute(`
                 SELECT id, name, email, role_id, created_at
-                FROM users WHERE id=? LIMIT 1 
-            `, [id]);
+                FROM users WHERE ${getBy}=? LIMIT 1 
+            `, [value]);
             const user = queryResponse[0];
             return user;
         } catch (err) {
@@ -45,11 +46,14 @@ module.exports = class User {
                 throw error;
             }
 
+            // Encrypt password
+            this.password = await bcrypt.hash(this.password, 10);
+
             const [queryResp] = await db.execute(
                 'INSERT INTO users (name, email, password, role_id) VALUES (?, ?, ?, ?)',
                 [this.name, this.email, this.password, this.role_id]);
                 this.id = queryResp.insertId;
-            return await User.getOne(this.id);
+            return await User.getOne('id', this.id);
         } catch (err) {
             throw err;
         }
@@ -82,7 +86,7 @@ module.exports = class User {
                 paramArray = [this.name, this.email, this.role_id, this.id];
             }
             const [queryResp] = await db.execute(sqlQuery, paramArray);
-            const updatedUser = await User.getOne(this.id);
+            const updatedUser = await User.getOne('id', this.id);
             return updatedUser;
         } catch (err) {
             throw err            
@@ -118,12 +122,21 @@ module.exports = class User {
         }
     }
 
-    async isEmailAvailable(email) {
+    async isEmailAvailable() {
         try {
-            const [queryResp] = await db.execute(`SELECT id FROM users WHERE email=?`, [email]);
+            const [queryResp] = await db.execute(`SELECT id FROM users WHERE email=?`, [this.email]);
             const emailAvailable = queryResp.length === 0 ||
                 (queryResp.length === 1 && this.id === queryResp[0].id);
             return emailAvailable;
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    async getPassword() {
+        try {
+            const [queryResp] = await db.execute(`SELECT password FROM users WHERE email=?`, [this.email]);
+            return queryResp[0].password;
         } catch(err) {
             throw err;
         }
