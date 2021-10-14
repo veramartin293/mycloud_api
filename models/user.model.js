@@ -11,12 +11,22 @@ module.exports = class User {
         this.role_id = user.role_id;
     }
 
+    static async getTotalCount() {
+        try {
+            const [queryResponse] = await db.execute('SELECT count(id) as count FROM users');
+            return queryResponse[0].count;
+        } catch(err) {
+            throw err;
+        }
+    }
+
     // Get one user by id
     static async getOne(getBy, value) {
         try {
             const [queryResponse] = await db.execute(`
-                SELECT id, name, email, role_id, created_at
-                FROM users WHERE ${getBy}=? LIMIT 1 
+                SELECT u.id, u.name, u.email, r.name as role, u.created_at
+                FROM users u INNER JOIN roles r ON u.role_id=r.id
+                WHERE u.${getBy}=?
             `, [value]);
             const user = queryResponse[0];
             return user;
@@ -26,9 +36,16 @@ module.exports = class User {
     }
 
     // Get all users
-    static async getAll() {
+    static async getAll(page = 1) {
         try {
-            const [users] = await db.execute('SELECT id, name, email, role_id, created_at FROM users');
+            const pageSize = 5;
+            const skippedRows = (page - 1) * pageSize;
+            const [users] = await db.execute(`
+                SELECT u.id, u.name, u.email, r.name as role, u.created_at
+                FROM users u INNER JOIN roles r ON u.role_id=r.id
+                ORDER BY u.id DESC
+                LIMIT ${pageSize} OFFSET ${skippedRows}
+            `);
             return users;
         }
         catch(err) {
@@ -55,6 +72,8 @@ module.exports = class User {
                 this.id = queryResp.insertId;
             return await User.getOne('id', this.id);
         } catch (err) {
+            //1452 error code is a foreign key error
+            if (err.errno === 1452) err.message = 'The role_id is invalid.'
             throw err;
         }
     }
@@ -89,6 +108,7 @@ module.exports = class User {
             const updatedUser = await User.getOne('id', this.id);
             return updatedUser;
         } catch (err) {
+            if (err.errno === 1452) err.message = 'The role_id is invalid.'
             throw err            
         }
     }

@@ -13,10 +13,17 @@ module.exports.getOne = async (req, res) => {
     }
 }
 
-module.exports.getAll = async (_req, res) => {
+module.exports.getAll = async (req, res) => {
     try {
-        const users = await User.getAll();
-        return res.status(200).json(users);
+        // Get and validate the page number
+        let page = parseInt(req.query.page);
+        if (isNaN(page) || !page) {
+            page = 1;
+        }
+
+        const users = await User.getAll(page);
+        const count = await User.getTotalCount();
+        return res.status(200).json({total: count, data: users});
     } catch (err) {
         const statusCode = err.statusCode || 500;
         return res.status(statusCode).json({
