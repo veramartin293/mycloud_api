@@ -12,8 +12,6 @@ module.exports = class File {
         this.file_type = mimeTypes.extension(file.mimetype).toLowerCase();
         this.created_at = null;
         this.original_name = file.originalname;
-
-        console.log(file);
     }
 
     // Store the file fields in DB

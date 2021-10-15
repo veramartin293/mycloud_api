@@ -9,8 +9,7 @@ niv.addCustomMessages({
 // Validate the input data on POST requests
 function validate(data) {
     const validator = new niv.Validator(data, {
-        file: 'required',
-        user_id: 'required|integer',
+        file: 'required'
     });
     return validator;
 }
@@ -38,7 +37,7 @@ const uploadFile = (req, res) => {
             // Everything went fine with the upload.
     
             // Validate data
-            const validator = validate({file: req.file, user_id: req.body.user_id});
+            const validator = validate({ file: req.file });
             const validated = await validator.check();
             if (!validated) {
                 const responseObj = { errors: validator.errors };
@@ -46,7 +45,7 @@ const uploadFile = (req, res) => {
             }
     
             // Store the file in DB
-            const fileObj = new File(req.file, req.body.user_id);
+            const fileObj = new File(req.file, req.user.id);
             if (await fileObj.store()) {
                 res.status(200).json({message: 'File stored successfully.'})
             }
