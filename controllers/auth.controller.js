@@ -15,6 +15,8 @@ module.exports.login = async(req, res) => {
             const responseObj = { errors: validator.errors };
             return res.status(422).json(responseObj);
         }
+        email.trim();
+        password.trim();
 
         // Verify email and password are correct
         let user = new User({email, password});

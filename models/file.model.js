@@ -11,6 +11,9 @@ module.exports = class File {
         this.user_id = user_id;
         this.file_type = mimeTypes.extension(file.mimetype).toLowerCase();
         this.created_at = null;
+        this.original_name = file.originalname;
+
+        console.log(file);
     }
 
     // Store the file fields in DB
@@ -32,9 +35,9 @@ module.exports = class File {
 
             // Store file data into DB
             await db.execute(`
-                INSERT INTO files (path, file_type, user_id) VALUES
-                (?, ?, ?)
-            `, [this.path, this.file_type, this.user_id]);
+                INSERT INTO files (path, original_name, file_type, user_id) VALUES
+                (?, ?, ?, ?)
+            `, [this.path, this.original_name, this.file_type, this.user_id]);
 
             return true;
         } catch (err) {
@@ -49,7 +52,7 @@ module.exports = class File {
             const pageSize = 5;
             const skippedRows = (page - 1) * pageSize;
             const [queryResponse] = await db.execute(`
-            SELECT f.id, f.path, f.file_type, u.name as propetary, f.created_at
+            SELECT f.id, f.path, f.original_name, f.file_type, u.name as propetary, f.created_at
             FROM files f INNER JOIN users u ON f.user_id=u.id
             ORDER BY f.id DESC
             LIMIT ${pageSize} OFFSET ${skippedRows}
