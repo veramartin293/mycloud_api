@@ -1,5 +1,5 @@
 // Environment variables
-require('custom-env').env('development');
+require('custom-env').env();
 
 // Module imports
 const express = require('express');

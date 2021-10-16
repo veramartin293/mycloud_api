@@ -2,3 +2,4 @@ node_modules/
 public/files/
 .env.development
 .env.production
+.env
