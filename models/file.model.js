@@ -25,7 +25,7 @@ module.exports = class File {
             if (isFileAnImage) {
                 const thumbnailPath = `/files/thumb_${this.name}`;
                 await sharp(`public/${this.path}`).resize({
-                    width: 500
+                    width: 250
                 }).toFile(`./public/files/thumb_${this.name}`);
                 this.path = thumbnailPath;
             }
@@ -47,7 +47,7 @@ module.exports = class File {
 
     static async getAll(page = 1) {
         try {
-            const pageSize = 20;
+            const pageSize = 10;
             const skippedRows = (page - 1) * pageSize;
             const [queryResponse] = await db.execute(`
             SELECT f.id, f.path, f.original_name, f.file_type, u.name as propetary, f.created_at
