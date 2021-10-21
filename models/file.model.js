@@ -47,7 +47,7 @@ module.exports = class File {
 
     static async getAll(page = 1) {
         try {
-            const pageSize = 10;
+            const pageSize = 20;
             const skippedRows = (page - 1) * pageSize;
             const [queryResponse] = await db.execute(`
             SELECT f.id, f.path, f.original_name, f.file_type, u.name as propetary, f.created_at

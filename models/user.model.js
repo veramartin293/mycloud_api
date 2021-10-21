@@ -38,7 +38,7 @@ module.exports = class User {
     // Get all users
     static async getAll(page = 1) {
         try {
-            const pageSize = 5;
+            const pageSize = 20;
             const skippedRows = (page - 1) * pageSize;
             const [users] = await db.execute(`
                 SELECT u.id, u.name, u.email, r.name as role, u.created_at
