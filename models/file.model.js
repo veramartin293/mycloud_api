@@ -25,7 +25,7 @@ module.exports = class File {
             if (isFileAnImage) {
                 const thumbnailPath = `/files/thumb_${this.name}`;
                 await sharp(`public/${this.path}`).resize({
-                    width: 250
+                    width: Number(process.env.IMG_RESIZE_WIDTH)
                 }).toFile(`./public/files/thumb_${this.name}`);
                 this.path = thumbnailPath;
             }
