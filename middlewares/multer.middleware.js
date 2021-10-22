@@ -14,7 +14,7 @@ const upload = multer({
     storage: storage,
     fileFilter: function(_req, file, cb) {
         const fileType = mimeTypes.extension(file.mimetype).toLowerCase();
-        const acceptedTypes = ['jpg', 'jpeg', 'png', 'docx', 'xlsx', 'csv'];
+        const acceptedTypes = ['jpg', 'jpeg', 'png', 'docx', 'xlsx', 'vnd.ms-excel'];
         if (!acceptedTypes.includes(fileType)) {
             const err = new Error('A valid file type is mandatory (jpg, jpeg, png, docx, xlsx, csv).');
             err.code= 'LIMIT_TYPE';
